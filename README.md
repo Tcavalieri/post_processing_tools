@@ -11,6 +11,6 @@ The content includes:
 - one function that calculate the normal distribution
 - one function for the running average
 - one dictionary for the units used in the simulation (units real of LAMMPS)
-- one script that collect all the function mentioned above and is used for all the calculations at once.
+- one script that collect all the function mentioned above and is used for all the calculations at once (postprocessing.py).
 
 Note: all this function are still in progress.
