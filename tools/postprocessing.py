@@ -22,6 +22,9 @@ xa_tol = 0.4
 t_damp = 10
 # damping parameter of the barostat
 p_damp = 10000
+# name of the table you want to use for the barostat and thermostat. please remember that the minimization data table could create errors and crash. if is the 1st table,
+# start from the 2nd
+table_name = 'Table1'
 # batch factor for a sort of 'block average' (is not truly a block average!) in this case choosen to obtain 10 batch (10000 points collected)
 batch = 1000
 # tolerance for the calculation of the average values (empirically choosen and can be improved seing the results) (is also a guess because the program will automatically
@@ -38,7 +41,7 @@ Data = lammps_log_parsing('log.lammps')
 plots_maker(Data,units,ra_tol,xa_tol)
 
 # analyze the behaviour of T and p
-thermo_baros(Data,'Table1',t_damp,p_damp)
+thermo_baros(Data,table_name,t_damp,p_damp)
 
 # extract the average value of the properties
 stati(Data,units,batch,tol)
