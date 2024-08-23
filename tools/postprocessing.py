@@ -30,6 +30,8 @@ batch = 1000
 # tolerance for the calculation of the average values (empirically choosen and can be improved seing the results) (is also a guess because the program will automatically
 # adjust it until convergence is met)
 tol = 0.0005 # good guess especially for the density
+# maximum number of iteration allowed
+max_iter = 10
 
 
 # calculations
@@ -44,7 +46,7 @@ plots_maker(Data,units,ra_tol,xa_tol)
 thermo_baros(Data,table_name,t_damp,p_damp)
 
 # extract the average value of the properties
-stati(Data,units,batch,tol)
+stati(Data,units,batch,tol,max_iter)
 
 
 
