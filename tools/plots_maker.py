@@ -1,9 +1,6 @@
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-
-# this function need the RunningAverage function to be able to work properly
-# make sure to have the respective script in the same folder of this one
 import stat_func
 
 def plots_maker(dict,units,ra_tol,x_tol,y_tol='none'):
