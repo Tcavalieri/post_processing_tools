@@ -3,7 +3,7 @@
 This repository host a series of python functions useful for the post processing of LAMMPS log.lammps file.
 The content includes:
 - one functions able to read a .txt file
-- two functions that convert dictionaries of pandas dataframes in a .txt and .xlsx files
+- two functions that convert dictionaries of pandas dataframes in a .txt and .xlsx files in file_writing.py library
 - one function for the parsing of the log.lammps output file
 - one function for the creation of the plots of all the properties collected during the simulation
 - one function for computing the average of all the properties
