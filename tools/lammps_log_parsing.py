@@ -1,8 +1,7 @@
 import io
 import pandas as pd
 from txt_reading import txt_reading
-from df_dict_to_txt import df_dict_to_txt
-from df_dict_to_xlsx import df_dict_to_xlsx
+import dict_writing
 
 def lammps_log_parsing(file_name):
     """
@@ -42,9 +41,9 @@ def lammps_log_parsing(file_name):
         tables_dict[tables_keys[i]] = pd.read_csv(io.StringIO('\n'.join(string_list)), sep='\s+') # creation of each dataframe througth the creation of a csv file (sep='\s+' tell that the delimiter is a white space)
 
     # creation of a txt file to store the dictionary of dataframes
-    df_dict_to_txt(tables_dict,'data_tables.txt')       
+    dict_writing.df_to_txt(tables_dict,'data_tables.txt')       
     # creation of a txt file to store the dictionary of dataframes
-    df_dict_to_xlsx(tables_dict)
+    dict_writing.df_to_xlsx(tables_dict)
     
     return tables_dict
 
