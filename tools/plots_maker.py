@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 # this function need the RunningAverage function to be able to work properly
 # make sure to have the respective script in the same folder of this one
-from running_average import running_average
+import stat_func
 
 def plots_maker(dict,units,ra_tol,x_tol,y_tol='none'):
     """
@@ -33,7 +33,7 @@ def plots_maker(dict,units,ra_tol,x_tol,y_tol='none'):
             file = key + '_' + header[k] + '.jpg'
             # calculation of the running average
             raw_data = np.array(dframe[header[k]])
-            ra = running_average(raw_data,ra_tol)
+            ra = stat_func.run_ave(raw_data,ra_tol)
             
             # creation of the plot
             plt.plot(t,raw_data,label=header[k])

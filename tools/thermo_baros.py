@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import math
-from normal_dist import normal_dist
+import stat_func
 
 def thermo_baros(data,table_name,t_damp,p_damp):
     """
@@ -48,7 +48,7 @@ def thermo_baros(data,table_name,t_damp,p_damp):
     # print the histograms and normal distributions for comparison
     # the value density = 'True' convert the frequency histogram to a probability density histogram
     plt.hist(df_t,bins=delta_t,density='True')
-    plt.plot(x_t,normal_dist(x_t,var_t,mu_t),label='normal_dist')
+    plt.plot(x_t,stat_func.normal_dist(x_t,var_t,mu_t),label='normal_dist')
     plt.title(f'Thermostat damp={t_damp} ps')
     plt.xlabel('Temperature (K)')
     plt.ylabel('Probability density')
@@ -57,7 +57,7 @@ def thermo_baros(data,table_name,t_damp,p_damp):
     plt.close('all') # very important to close the file once finished, otherwise at each step we obtain a cumulative plot !!
     
     plt.hist(df_p,bins=delta_p,density='True')
-    plt.plot(x_p,normal_dist(x_p,var_p,mu_p),label='normal_dist')
+    plt.plot(x_p,stat_func.normal_dist(x_p,var_p,mu_p),label='normal_dist')
     plt.title(f'Barostat damp={p_damp} ps')
     plt.xlabel('Pressure (atm)')
     plt.ylabel('Probability density')
