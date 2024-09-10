@@ -2,7 +2,7 @@ import numpy as np
 import math
 import pandas as pd
 
-import dict_writing
+from filehandling.dict_writing import*
 
 # this function calculate the average, standard deviation and error of a given property data set
 # dataframe: dataframe with all properties after a simulation (pandas dataframe if used data_parsing.py module)
@@ -130,7 +130,7 @@ def stati(df_dict,units,batch_factor,tol,max_iter):
         calc_dict['Tolerance'] = tolerance
         results[key + '_' +'properties'] = pd.DataFrame(calc_dict) # conversion of the dictionary in a pandas dataframe
     # creation of a txt and xlsx file with the results
-    dict_writing.df_to_txt(results,'statistics.txt')
-    dict_writing.df_to_xlsx(results)
+    df_to_txt(results,'statistics.txt')
+    df_to_xlsx(results)
 
     return results
