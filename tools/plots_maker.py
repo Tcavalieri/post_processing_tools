@@ -41,7 +41,7 @@ def plots_maker(dict,units,ra_tol,x_tol,y_tol='none'):
             else:
                 plt.ylim(ra[-1]*(1-y_tol),ra[-1]*(1+y_tol))
 
-            plt.xlim(t[-1]*x_tol,t[-1])
+            plt.xlim(t[int(-len(t)*x_tol)],t[-1])
             plt.xlabel('time (ns)')
             plt.ylabel(units[header[k]])
             plt.title(header[k])
