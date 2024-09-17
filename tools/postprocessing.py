@@ -1,5 +1,5 @@
 # import the function for the parsing
-from lammps_log_parsing import lammps_log_parsing
+from parsing import parsing
 # import dictionary of units
 from units_dict import units
 # import the function for the creation of plots
@@ -8,6 +8,8 @@ from plots_maker import plots_maker
 from thermo_baros import thermo_baros
 # import the properties calculator
 from stati import stati
+# import the function for the equilibration plots
+from equilibration_plot import equilibration_plot
 
 # input parameters for all the functions
 
@@ -24,7 +26,7 @@ t_damp = 10
 p_damp = 10000
 # name of the table you want to use for the barostat and thermostat. please remember that the minimization data table could create errors and crash. if is the 1st table,
 # start from the 2nd
-table_name = 'Table1'
+table_name = 'Table33'
 # batch factor for a sort of 'block average' (is not truly a block average!) in this case choosen to obtain 10 batch (10000 points collected)
 batch = 1000
 # tolerance for the calculation of the average values (empirically choosen and can be improved seing the results) (is also a guess because the program will automatically
@@ -37,7 +39,7 @@ max_iter = 10
 # calculations
 
 # extract the data in the log file
-Data = lammps_log_parsing('log.lammps')
+Data = parsing('log.lammps',['Per','MPI','rank','memory'],['Loop','time','of'],txt_check=False,xlsx_check=False)
 
 # create the plots of the properties
 plots_maker(Data,units,ra_tol,xa_tol)
@@ -46,7 +48,8 @@ plots_maker(Data,units,ra_tol,xa_tol)
 thermo_baros(Data,table_name,t_damp,p_damp)
 
 # extract the average value of the properties
-stati(Data,units,batch,tol,max_iter)
+stati(Data,units,batch,tol,max_iter,txt_check=True,xlsx_check=False,minim_check=True)
 
-
+# create equilibration plots
+equilibration_plot(Data,minim_check=True)
 
