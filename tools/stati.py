@@ -10,7 +10,7 @@ from filehandling.dict_writing import*
 # batch_factor: number of data in each batch for the calculations
 # tol: tolerance for the comparison between batches
 
-def stati(df_dict,units,batch_factor,tol,max_iter):
+def stati(df_dict,units,batch_factor,tol,max_iter,txt_check,xlsx_check,minim_check):
     """
     the function calculate the average, standard deviation and tell the intervall of the average of all properties stored in all the tables stored in a dictionary.
     parameters:
@@ -18,6 +18,9 @@ def stati(df_dict,units,batch_factor,tol,max_iter):
     units (dict): dictionary that stores the units of all properties (LAMMPS unit real)
     batch_factor (int): integer that tells how many batch you want and how many data in each one for the estimation of the intervall for the calculations. will be automatically modified if needed.
     tol (float): initial value for the tolerance criterion to establish the intervall for the calculations. if no convergence is reached it will be automaticaly updated.
+    txt_check (boolean): if True create a txt file with the results.
+    xlsx_check (boolean): if True create multiple (as the number of tables) xlsx file with the results.
+    minim_check (boolean): if True the minimization table is present and will be excluded in the calculations.
     max_iter (int): maximum number of iteration for the automatic update of the tolerance for convergence.
     return:
     results (dict): dictionary with all the tables with all the calculations for each property. will be also stored in a file statistics.txt
@@ -26,6 +29,11 @@ def stati(df_dict,units,batch_factor,tol,max_iter):
     
     for key in df_dict.keys():
         
+        if minim_check == True:
+            # exclude minimization table
+            if key == 'Table1':
+                continue
+
         dataframe = df_dict[key]
         header = dataframe.columns
         t = dataframe[header[0]]/1000000
@@ -129,8 +137,12 @@ def stati(df_dict,units,batch_factor,tol,max_iter):
         calc_dict['Delta t (ns)'] = delta_t
         calc_dict['Tolerance'] = tolerance
         results[key + '_' +'properties'] = pd.DataFrame(calc_dict) # conversion of the dictionary in a pandas dataframe
-    # creation of a txt and xlsx file with the results
-    df_to_txt(results,'statistics.txt')
-    df_to_xlsx(results)
+    
+    if txt_check == True:
+        # creation of txt file with the results
+        df_to_txt(results,'statistics.txt')
+    if xlsx_check == True:
+        # creation of xlsx files with the results
+        df_to_xlsx(results)
 
     return results
