@@ -14,6 +14,7 @@ def parsing(file_name,init_key,fin_key,txt_check,xlsx_check):
     tables_dict (dict): dictionary of dataframe.
 
     '''
+    # initialisation
     n = 0
     k = 0
     i = 0
@@ -21,6 +22,7 @@ def parsing(file_name,init_key,fin_key,txt_check,xlsx_check):
 
     file = []
 
+    # main loop
     with open(file_name) as f:
         while True:
         
@@ -66,7 +68,13 @@ def parsing(file_name,init_key,fin_key,txt_check,xlsx_check):
 
     for i in range(len(init)):
         tables_keys[i] = 'Table' + str(i+1) # creation of the dictionary's keys with progressive numbers
-        string_list = file[init[i]+2:fin[i]] # slicing of main file (i+2 is needed to exclude the key sentence used to find the table and the header with the name of the properties)
+        
+        # this if statement is to handle cases in witch the last table is incomplete because of a crash of the programm
+        if len(init)-1 == len(fin):
+            string_list = file[init[i]+2:] # slicing of main file (i+2 is needed to exclude the key sentence used to find the table and the header with the name of the properties)
+        else:
+            string_list = file[init[i]+2:fin[i]] # slicing of main file (i+2 is needed to exclude the key sentence used to find the table and the header with the name of the properties)
+        
         intermidiate = pd.DataFrame(string_list, columns=file[init[i]+1]) # the init[i]+1 is needed to give the header for the creation of the columns name in the dataframe
         tables_dict[tables_keys[i]] = intermidiate.astype(float, errors='ignore')
 
