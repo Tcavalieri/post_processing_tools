@@ -1,15 +1,7 @@
-# import the function for the parsing
-from tools.filehandling import parsing
-# import dictionary of units
+from tools.filehandling import *
+from tools.plotting import *
 from tools.units_dict import units
-# import the function for the creation of plots
-from tools.plotting import plots_maker
-# import the post processing tools for the barostat and thermostat
-from tools.thermo_baros import thermo_baros
-# import the properties calculator
-from tools.stati import stati
-# import the function for the equilibration plots
-from tools.plotting import equilibration_plot
+from tools.statis_calc import *
 
 # input parameters for all the functions
 
