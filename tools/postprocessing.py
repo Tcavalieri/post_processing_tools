@@ -1,7 +1,7 @@
-from tools.filehandling import *
-from tools.plotting import *
-from tools.units_dict import units
-from tools.statis_calc import *
+from filehandling import *
+from plotting import *
+from units_dict import units
+from statis_calc import *
 
 # input parameters for all the functions
 
@@ -23,7 +23,7 @@ table_name = 'Table33'
 batch = 1000
 # tolerance for the calculation of the average values (empirically choosen and can be improved seing the results) (is also a guess because the program will automatically
 # adjust it until convergence is met)
-tol = 0.0005 # good guess especially for the density
+tol = 0.001 # good guess especially for the density
 # maximum number of iteration allowed
 max_iter = 10
 
