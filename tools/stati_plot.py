@@ -12,6 +12,8 @@ def stati_plot(dict,txt_check,e_electro):
     dict (dict): a dictionary o dataframe with in it tables (step) as columns with in it all the relevant statistics for all the properties (dataframe).
     txt_check (boolean): if True it creates a txt file with all the results.
     e_electro (boolean): if True it creates a new entry for the total electrostatic energy.
+    Return:
+    property_summary (dict): dictionary of dataframes with all the values organised per property and inside per table.
     '''
     # initialisation (to be improved)
     property_summary ={}
