@@ -9,6 +9,7 @@ def equilibration_plot(dict,minim_check,e_electro):
     Parameters:
     dict (dict): dictionary of dataframes with the data.
     minim_check (boolean): if True it exclude the minimization data.
+    e_electro (boolean): if True create a plot for the total electrostatic energy.
     '''
     
     df = dict['Table2']
