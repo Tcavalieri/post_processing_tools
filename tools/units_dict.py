@@ -11,6 +11,7 @@ units ={
     'E_coul' : 'kcal/mol',
     'E_long' : 'kcal/mol',
     'E_tail' : 'kcal/mol',
+    'E_electro' : 'kcal/mol',
     'Temp' : 'K',
     'Press' : 'atm',
     'Density' : 'g/cm3'

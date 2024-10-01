@@ -3,9 +3,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from filehandling.dict_writing import *
 from units_dict import units
+import math
 
-def stati_plot(dict,txt_check):
+def stati_plot(dict,txt_check,e_electro):
     '''
+    Function that create a dictionary of dataframe with the property as columns and the mean and std for each table(step) in it (dataframe). It also plots the results.
+    Parameters:
+    dict (dict): a dictionary o dataframe with in it tables (step) as columns with in it all the relevant statistics for all the properties (dataframe).
+    txt_check (boolean): if True it creates a txt file with all the results.
+    e_electro (boolean): if True it creates a new entry for the total electrostatic energy.
+    Return:
+    property_summary (dict): dictionary of dataframes with all the values organised per property and inside per table.
     '''
     # initialisation (to be improved)
     property_summary ={}
@@ -43,7 +51,18 @@ def stati_plot(dict,txt_check):
         dict_aux['Average'] = ave
         dict_aux['Standard Deviation'] = std
         property_summary[prop_list[n]] = pd.DataFrame(dict_aux) # creation of the dataframes for each new table of average and stand. dev values
-
+    # conditional and related loop for the calculation of the averaged total electrostatic energy and its standard deviation    
+    if e_electro == True:
+        ave_el = []
+        std_el = []
+        for key in dict.keys():
+            df_el = dict[key]
+            ave_el.append(df_el.iloc[8]['Average'] + df_el.iloc[9]['Average'])
+            std_el.append(math.sqrt((df_el.iloc[8]['Standard Deviation'])**2 + (df_el.iloc[9]['Standard Deviation'])**2))
+        dict_aux['Average'] = ave_el
+        dict_aux['Standard Deviation'] = std_el
+        property_summary['E_electro'] = pd.DataFrame(dict_aux)
+        
     # extraction of the Temperature values in the relevant step (NpT after ramp) for the plots
     temp = []
     temp_std = []
