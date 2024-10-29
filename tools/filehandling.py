@@ -51,14 +51,26 @@ def txt_reading(file_name):
 
 def dict_merge(dicts,evidence_table,txt_check):
     '''
+    function for the creation of a dictionary of tables by merging two incomplete dictionary (used especially after restart of an interrupted simulation).
+    Parameters:
+    dicts (list): list of dictionary that you want to merge.
+    evidence_table (str): the name o f the incomplete table present in both the incomplete dictionaries. The merging point.
+    txt_check (boolean): boolean that if True will create a txt file of the merged dict.
+    Return:
+    merged_dict (dict): dictionary of pandas dataframes (tables with the data of the simulation).
     '''
+    # initialisation of the merged dict
     merged_dict = {}
     k = 0
     b = False
+
+    # loop for the two dicts you want to be merged together
     for dict in dicts:
         
+        # loop that goes through all the tables present in each dict
         for key in dict.keys():
             
+            # if the table of the second dict is the one incomplete will be merged with the last table of the first dict.
             if f'Table{k}' == evidence_table:
                 k = k + 1
                 b = True
@@ -66,16 +78,16 @@ def dict_merge(dicts,evidence_table,txt_check):
                 content = dict[key]
                 merged_dict[evidence_table] = pd.concat([a,content],ignore_index=True)
             else:
-                
+                # this conditional handle the enumeration of the tables after the merging to not skip number
                 if b == True:
                     k = k - 1
                     b = False
-                
+            # this store each table in a new dictionary that will be the final merged one    
                 k = k + 1
                 table_name = f'Table{k}'
                 content = dict[key]
                 merged_dict[table_name] = content
-    
+    # conditional that handle the printing of a txt file with the results.
     if txt_check == True:
         df_to_txt(merged_dict,'merged_data.txt')
 
