@@ -103,7 +103,7 @@ def stati_plot(dict,txt_check,e_electro):
 # batch_factor: number of data in each batch for the calculations
 # tol: tolerance for the comparison between batches
 
-def stati(df_dict,units,batch_factor,tol,max_iter,txt_check,xlsx_check,minim_check):
+def stati(df_dict,units,n_batch,tol,max_iter,txt_check,xlsx_check,minim_check):
     """
     the function calculate the average, standard deviation and tell the intervall of the average of all properties stored in all the tables stored in a dictionary.
     parameters:
@@ -130,11 +130,9 @@ def stati(df_dict,units,batch_factor,tol,max_iter,txt_check,xlsx_check,minim_che
         dataframe = df_dict[key]
         header = dataframe.columns
         t = dataframe[header[0]]/1000000
-        n_batch = int(len(t)/batch_factor) # number of batches
-        # check for compatibility of len(t) and batch_factor for the problem of len(t)<batch_factor or len(t)/batch_factor is not integer or too small
-        if n_batch < 10:
-            batch_factor = int(len(t)/10)
-            n_batch = int(len(t)/batch_factor)
+        nt = len(t)
+        batch_points = int(len(t)/n_batch) # number of points in each batch
+
         # initialization for the collection of values
         calc_dict = {} # dictionary for all the properties values
         # the list of values for each key of the dict initialized 
@@ -144,20 +142,26 @@ def stati(df_dict,units,batch_factor,tol,max_iter,txt_check,xlsx_check,minim_che
         dev_std = []
         delta_t = []
         tolerance = []
+        n_points = []
+        notes = []
 
         for i in range(1,len(header)):
         
             sub_df = np.array(dataframe[header[i]]) # converting the column in a np array
 
             average_list = [] # initialization
-            for n in range(0,n_batch):
+            for n in range(1,n_batch):
                 # slicing for the creation of a batch
-                s_df = sub_df[(n)*batch_factor:(n+1)*batch_factor]
+                if n == 1:
+                    s_df = sub_df[(-n)*batch_points:]
+                else:
+                    s_df = sub_df[(nt-1)-(n)*batch_points:(nt-1)-(n-1)*batch_points]
+
                 m = np.mean(s_df)
                 average_list.append(m)
             
             # this loop tell which batches are very similar and so they could be averaged together for better statystics
-            k = 0
+            k = []
             err = 0 #counter that account for division by zero
             for ii in range(1,len(average_list)):
                 # check for division by zero
@@ -166,7 +170,17 @@ def stati(df_dict,units,batch_factor,tol,max_iter,txt_check,xlsx_check,minim_che
                     continue
                     
                 if abs(1-abs((average_list[ii]/average_list[ii-1]))) < tol:
-                    k = k + 1
+                    k.append(1)
+                else:
+                    k.append(0)
+            
+            # loop for checking that only the consecutive batches that satisfy the tolerance are considered and not all of them in random position in the dataset
+            ref_k = 0
+            for index in k:
+                if index == 1:
+                    ref_k = ref_k + 1
+                else:
+                    break   
             # printing for division by zero    
             if err >= 1:
                 print('warning: division by zero encountered, maybe minim data')
@@ -176,52 +190,33 @@ def stati(df_dict,units,batch_factor,tol,max_iter,txt_check,xlsx_check,minim_che
             property.append(header[i])
             unit_measure.append(units[header[i]])
             # this conditional handle the situation for which the block average has not satisfied the criterion tol
-            if k == 0 and err == 0: # account also for the situation with zero values in minimization data
-                factor = 10
-                # this loop increase the tolerance criterion by a factor 10 at each iteration until convergence is reached
-                esc = 0 # counter for escaping if convergence is not met in  max_step number of step
-                flag = False
-                while k == 0:
-                    for ii in range(1,len(average_list)):
-                        if abs(1-abs((average_list[ii]/average_list[ii-1]))) < tol*factor:
-                            k = k + 1
-                    factor = factor*10
-                    # check for the number of step
-                    if esc == max_iter:
-                        print('max iterations reached: no convergence met, maybe minimization data')
-                        print(key +' '+ header[i])
-                        flag = True
-                        break
-                    else:
-                        esc = esc + 1
-                # handle the case of exceded the max number of iterations
-                if flag == True:
-                    average.append('none')
-                    delta_t.append('none') 
-                    dev_std.append('none') 
-                    tolerance.append(tol*factor/10)  # /10 is to extract the right tolerance at the beginning of each step of the loop
-                else:
-                    ave = np.mean(sub_df[-k*batch_factor:])
-                    average.append(ave)
-                    tt = np.array(t[-k*batch_factor:])
-                    delta_t.append(str(tt[0]) + '-' + str(tt[-1])) # extract the time intervall used for the average
-                    var = np.sum((sub_df[-k*batch_factor:]-ave)**2)/len(sub_df[-k*batch_factor:]) # calculate variance
-                    dev_std.append(math.sqrt(var)) # calculate standard deviation
-                    tolerance.append(tol*factor/10)  # /10 is to extract the right tolerance at the beginning of each step of the loop
+            if err > 1:
+                average.append('none')
+                delta_t.append('none') 
+                dev_std.append('none') 
+                tolerance.append('none')
+                n_points.append('none')
+                notes.append('WARNING') 
+            elif ref_k == 0 and err == 0:  
+                ave = np.mean(sub_df[-batch_points:])
+                average.append(ave)
+                tt = np.array(t[-batch_points:])
+                delta_t.append(str(tt[0]) + '-' + str(tt[-1])) # extract the time intervall used for the average
+                var = np.sum((sub_df[-batch_points:]-ave)**2)/len(sub_df[-batch_points:]) # calculate variance
+                dev_std.append(math.sqrt(var)) # calculate standard deviation
+                tolerance.append(tol)
+                n_points.append(len(sub_df[-batch_points:]))
+                notes.append('WARNING')
             else:
-                if err > 1:
-                    average.append('none')
-                    delta_t.append('none') 
-                    dev_std.append('none') 
-                    tolerance.append('none') 
-                else:  
-                    ave = np.mean(sub_df[-k*batch_factor:])
-                    average.append(ave)
-                    tt = np.array(t[-k*batch_factor:])
-                    delta_t.append(str(tt[0]) + '-' + str(tt[-1])) # extract the time intervall used for the average
-                    var = np.sum((sub_df[-k*batch_factor:]-ave)**2)/len(sub_df[-k*batch_factor:]) # calculate variance
-                    dev_std.append(math.sqrt(var)) # calculate standard deviation
-                    tolerance.append(tol)
+                ave = np.mean(sub_df[-(ref_k+1)*batch_points:])
+                average.append(ave)
+                tt = np.array(t[-(ref_k+1)*batch_points:])
+                delta_t.append(str(tt[0]) + '-' + str(tt[-1])) # extract the time intervall used for the average
+                var = np.sum((sub_df[-(ref_k+1)*batch_points:]-ave)**2)/len(sub_df[-(ref_k+1)*batch_points:]) # calculate variance
+                dev_std.append(math.sqrt(var)) # calculate standard deviation
+                tolerance.append(tol)
+                n_points.append(len(sub_df[-(ref_k+1)*batch_points:]))
+                notes.append('ok')
         # finalization of the dictionary with the calculated quantities
         calc_dict['Property'] = property
         calc_dict['Units'] = unit_measure
@@ -229,6 +224,8 @@ def stati(df_dict,units,batch_factor,tol,max_iter,txt_check,xlsx_check,minim_che
         calc_dict['Standard Deviation'] = dev_std
         calc_dict['Delta t (ns)'] = delta_t
         calc_dict['Tolerance'] = tolerance
+        calc_dict['N points'] = n_points
+        calc_dict['Notes'] = notes
         results[key + '_' +'properties'] = pd.DataFrame(calc_dict) # conversion of the dictionary in a pandas dataframe
     
     if txt_check == True:
