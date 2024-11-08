@@ -103,7 +103,7 @@ def stati_plot(dict,txt_check,e_electro):
 # batch_factor: number of data in each batch for the calculations
 # tol: tolerance for the comparison between batches
 
-def stati(df_dict,units,n_batch,tol,max_iter,txt_check,xlsx_check,minim_check):
+def stati(df_dict,units,n_batch,tol,txt_check,xlsx_check,minim_check):
     """
     the function calculate the average, standard deviation and tell the intervall of the average of all properties stored in all the tables stored in a dictionary.
     parameters:
@@ -114,7 +114,6 @@ def stati(df_dict,units,n_batch,tol,max_iter,txt_check,xlsx_check,minim_check):
     txt_check (boolean): if True create a txt file with the results.
     xlsx_check (boolean): if True create multiple (as the number of tables) xlsx file with the results.
     minim_check (boolean): if True the minimization table is present and will be excluded in the calculations.
-    max_iter (int): maximum number of iteration for the automatic update of the tolerance for convergence.
     return:
     results (dict): dictionary with all the tables with all the calculations for each property. will be also stored in a file statistics.txt
     """
@@ -131,7 +130,7 @@ def stati(df_dict,units,n_batch,tol,max_iter,txt_check,xlsx_check,minim_check):
         header = dataframe.columns
         t = dataframe[header[0]]/1000000
         nt = len(t)
-        batch_points = int(len(t)/n_batch) # number of points in each batch
+        batch_points = int(nt/n_batch) # number of points in each batch rounded
 
         # initialization for the collection of values
         calc_dict = {} # dictionary for all the properties values
@@ -155,7 +154,7 @@ def stati(df_dict,units,n_batch,tol,max_iter,txt_check,xlsx_check,minim_check):
                 if n == 1:
                     s_df = sub_df[(-n)*batch_points:]
                 else:
-                    s_df = sub_df[(nt-1)-(n)*batch_points:(nt-1)-(n-1)*batch_points]
+                    s_df = sub_df[nt-(n*batch_points):nt-((n-1)*batch_points)]
 
                 m = np.mean(s_df)
                 average_list.append(m)
@@ -196,7 +195,7 @@ def stati(df_dict,units,n_batch,tol,max_iter,txt_check,xlsx_check,minim_check):
                 dev_std.append('none') 
                 tolerance.append('none')
                 n_points.append('none')
-                notes.append('WARNING') 
+                notes.append('WARNING: division by zero') 
             elif ref_k == 0 and err == 0:  
                 ave = np.mean(sub_df[-batch_points:])
                 average.append(ave)
@@ -206,7 +205,7 @@ def stati(df_dict,units,n_batch,tol,max_iter,txt_check,xlsx_check,minim_check):
                 dev_std.append(math.sqrt(var)) # calculate standard deviation
                 tolerance.append(tol)
                 n_points.append(len(sub_df[-batch_points:]))
-                notes.append('WARNING')
+                notes.append(f'batches used: {1}')
             else:
                 ave = np.mean(sub_df[-(ref_k+1)*batch_points:])
                 average.append(ave)
@@ -216,7 +215,7 @@ def stati(df_dict,units,n_batch,tol,max_iter,txt_check,xlsx_check,minim_check):
                 dev_std.append(math.sqrt(var)) # calculate standard deviation
                 tolerance.append(tol)
                 n_points.append(len(sub_df[-(ref_k+1)*batch_points:]))
-                notes.append('ok')
+                notes.append(f'batches used: {ref_k + 1}')
         # finalization of the dictionary with the calculated quantities
         calc_dict['Property'] = property
         calc_dict['Units'] = unit_measure
