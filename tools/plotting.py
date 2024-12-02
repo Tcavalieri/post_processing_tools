@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import scipy.stats as stats
 import matplotlib.pyplot as plt
 from statis_calc import run_ave, normal_dist
 from units_dict import units
@@ -99,7 +100,7 @@ def equilibration_plot(dict,minim_check,e_electro):
 
 def thermo_baros(data,table_name,t_damp,p_damp):
     """
-    this function plots the probability density distribution as histograms for the temperature and pressure and compare it with normal distribution
+    this function plots the probability density distribution as histograms and the normal distribution fitting. It also produces the probability plots to check if the actual distribution follows a normal one.
     parameters:
     data (dict): dictionary of pandas dataframes with all the properties tables
     table_name (str): a string that tells which table to use
@@ -139,7 +140,7 @@ def thermo_baros(data,table_name,t_damp,p_damp):
     mu_t = np.mean(np.array(df_t))
     var_t = np.sum((np.array(df_t)-mu_t)**2)/len(df_t)
 
-    # print the histograms and normal distributions for comparison
+    # print the histograms and fitted normal distributions
     # the value density = 'True' convert the frequency histogram to a probability density histogram
     plt.hist(df_t,bins=delta_t,density='True')
     plt.plot(x_t,normal_dist(x_t,var_t,mu_t),label='normal_dist')
@@ -158,5 +159,14 @@ def thermo_baros(data,table_name,t_damp,p_damp):
     plt.legend()
     plt.savefig('Barostat.jpg',bbox_inches='tight') # remember to save the plot in the file created before (bbox.. to solve ylabel cut out)(to increase dimensionof figure use dpi=(integer))
     plt.close('all') # very important to close the file once finished, otherwise at each step we obtain a cumulative plot !!
+
+    # probability plots for thermostat and barostat
+    t_probplot = stats.probplot(df_t,dist='norm',plot=plt)
+    plt.savefig('thermo_probplot.jpg')
+    plt.close('all')
+
+    p_probplot = stats.probplot(df_p,dist='norm',plot=plt)
+    plt.savefig('baros_probplot.jpg')
+    plt.close('all')
 
 
