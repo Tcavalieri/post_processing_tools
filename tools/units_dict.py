@@ -14,5 +14,7 @@ units ={
     'E_electro' : 'kcal/mol',
     'Temp' : 'K',
     'Press' : 'atm',
-    'Density' : 'g/cm3'
+    'Density' : 'g/cm3',
+    'v_iacc' : 'insertion moves GCMC',
+    'v_dacc' : 'deletion moves GCMC'
 }

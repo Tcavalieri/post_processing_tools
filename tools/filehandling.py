@@ -115,7 +115,7 @@ def parsing(file_name,init_key,fin_key,txt_check,xlsx_check):
     file = []
 
     # main loop
-    with open(file_name) as f:
+    with open(file_name,'r',encoding='utf8') as f:
         while True:
         
             readfile = f.readline()

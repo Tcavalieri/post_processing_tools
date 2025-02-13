@@ -6,7 +6,7 @@ from statis_calc import run_ave, normal_dist
 from units_dict import units
 import math
 
-def plots_maker(dict,units,ra_tol,x_tol,y_tol='none'):
+def plots_maker(dict,units,ra_tol,x_tol,y_tol='none',GCMC_switch='off'):
     """
     Function that generate and store in files .jpg the plots of all the properties in all tables of data from a simulation with the running average.
     Parameters:
@@ -25,6 +25,12 @@ def plots_maker(dict,units,ra_tol,x_tol,y_tol='none'):
         header = dframe.columns
         
         for k in range(len(header)):
+            # conditional for GCMC moves
+            if k == len(header)-1 or k == len(header)-2:
+                x_tol_new = 1
+                GCMC_check = 'True'
+            else:
+                GCMC_check = 'False'
             # the first header is the time so we extract it and skip to the thermodynamic properties
             if k == 0:
                 t = np.array(dframe[header[k]])/1000000 # the /1000000 convert from fs to ns
@@ -39,19 +45,36 @@ def plots_maker(dict,units,ra_tol,x_tol,y_tol='none'):
             plt.plot(t,raw_data,label=header[k])
             plt.plot(t[len(t)-len(ra):],ra,label='Running_average')
 
-            if y_tol == 'none':
-                plt.ylim(min(raw_data[int(len(t)*x_tol):]),max(raw_data[int(len(t)*x_tol):]))
-            else:
-                plt.ylim(ra[-1]*(1-y_tol),ra[-1]*(1+y_tol))
+            # conditional for checking the insertion adn deletion moves if GCMC is used
+            if GCMC_switch == 'on' and GCMC_check == 'True':
 
-            plt.xlim(t[int(-len(t)*x_tol)],t[-1])
-            plt.xlabel('time (ns)')
-            plt.ylabel(units[header[k]])
-            plt.title(header[k])
-            plt.grid(True)
-            plt.legend()
-            plt.savefig(file,bbox_inches='tight') # remember to save the plot in the file created before (bbox.. to solve ylabel cut out)(to increase dimensionof figure use dpi=(integer))
-            plt.close('all') # very important to close the file once finished, otherwise at each step we obtain a cumulative plot !!
+                if y_tol == 'none':
+                    plt.ylim(min(raw_data[int(len(t)*(x_tol_new-0.98)):]),max(raw_data[int(len(t)*(x_tol_new-0.98)):]))
+                else:
+                    plt.ylim(ra[-1]*(1-y_tol),ra[-1]*(1+y_tol))
+
+                plt.xlim(t[int(-len(t)*x_tol_new)],t[-1])
+                plt.xlabel('time (ns)')
+                plt.ylabel(units[header[k]])
+                plt.title(header[k])
+                plt.grid(True)
+                plt.legend()
+                plt.savefig(file,bbox_inches='tight') # remember to save the plot in the file created before (bbox.. to solve ylabel cut out)(to increase dimensionof figure use dpi=(integer))
+                plt.close('all') # very important to close the file once finished, otherwise at each step we obtain a cumulative plot !!
+            else:
+                if y_tol == 'none':
+                    plt.ylim(min(raw_data[int(len(t)*x_tol):]),max(raw_data[int(len(t)*x_tol):]))
+                else:
+                    plt.ylim(ra[-1]*(1-y_tol),ra[-1]*(1+y_tol))
+
+                plt.xlim(t[int(-len(t)*x_tol)],t[-1])
+                plt.xlabel('time (ns)')
+                plt.ylabel(units[header[k]])
+                plt.title(header[k])
+                plt.grid(True)
+                plt.legend()
+                plt.savefig(file,bbox_inches='tight') # remember to save the plot in the file created before (bbox.. to solve ylabel cut out)(to increase dimensionof figure use dpi=(integer))
+                plt.close('all') # very important to close the file once finished, otherwise at each step we obtain a cumulative plot !!
 
 def equilibration_plot(dict,minim_check,e_electro):
     '''
